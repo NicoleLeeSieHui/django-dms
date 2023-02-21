@@ -1,0 +1,24 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Error Page
+{% endblock "title" %}
+
+{% block "content" %}
+
+<body class="cover"></body>
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-6 offset-3"> 
+            <div class="alert alert-danger" role="alert">                            
+                <h1> <p>Error : You are not the uploader !!</p> </h1> 
+                <hr>                           
+                <form method="POST">
+                    {% csrf_token %}
+                    <a class='btn btn-sm btn-info' href="{% url 'homepage' %}">Back</a>                               
+                </form>
+            </div>  
+        </div> 
+    </div>
+</div>
+{% endblock "content" %}
+</body>

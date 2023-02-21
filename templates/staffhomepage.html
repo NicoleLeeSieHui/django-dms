@@ -1,0 +1,103 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Home Page
+{% endblock "title" %}
+{% block "content" %}
+
+<body class="cover">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10">
+                <h1 > Document Management System</h1> 
+            </div>
+        <div class="col-lg-2">
+            <h5> Welcome, {{user.username}}. | <a href="/signout">Logout</a></h5>
+        </div>  
+    </div>
+</div>         
+
+<nav class="navbar navbar-expand-sm bg-dark">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:25px;" href="/staffhomepage">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:22px;" href="/UploadFile">Upload</a>
+    </ul>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10">
+        {% if user.is_authenticated %}
+
+        <br>
+        <div style="float:right">
+            <form class="form-inline">
+                <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                <button class="btn btn-info" type="submit">Search</button>
+            </form>
+        </div>
+        
+        <br><br><br>
+        <table class="table table-dark table-striped">
+            <tr>
+                <th>File Title</th>
+                <th>Uploader</th>
+                <th>File Link</th>
+                <th>Time Uploaded</th>
+                <th>Edit</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+    
+            {% for result in file %}
+            <tr>
+                <td>{{result.title}}</td>
+                <td>{{result.uploader}}</td>
+                <td><a href= "{{result.file.name}}">{{result.file.name}}</a></td>
+                <td>{{result.time}}</td>
+    
+                {% if result.uploader == user.username %}
+                <td><a class="btn btn-sm btn-secondary" href="{% url 'editfile' result.title %}" >Edit</a></td>
+    
+                {% else %}
+                <td><a class="btn btn-sm btn-secondary" href="/error">Edit</a></td>
+    
+                {% endif %}
+    
+                {% if result.uploader == user.username %}
+                <td><a class="btn btn-sm btn-info" href="{% url 'updatefile' result.title %}" >Update</a></td>
+    
+                {% else %}
+                <td><a class="btn btn-sm btn-info" href="/error">Update</a></td>
+    
+                {% endif %}
+    
+                {% if result.uploader == user.username %}
+                <td><a class="btn btn-sm btn-danger" href="{% url 'deletefile' result.title %}">Delete</a></td>
+    
+                {% else %}
+                <td><a class="btn btn-sm btn-danger" href="/error">Delete</a></td>
+    
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="col-lg-2">
+        <div class="container p-3 my-3 border border-dark">
+            <h5>Recently Viewed</h5>
+        </div>
+        <div class="container p-3 my-3 border border-dark">
+            <a href="#" class="text-reset"><u>Add Permission</u></a>
+            <br>
+            <a href="#" class="text-reset"><u>Generate Report</u></a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+</div>
+{% endblock "content" %}
+</body>

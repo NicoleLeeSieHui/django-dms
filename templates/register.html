@@ -1,0 +1,43 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Register Page
+{% endblock "title" %}
+
+{% block "content" %}
+<body class="cover">
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-6 offset-2">
+
+        <h3>Welcome To Register Page</h3>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {{rform.username.label}}
+            {{rform.username}}
+            <br>
+            {{rform.email.label}}
+            {{rform.email}}
+            <br>
+            {{rform.password1.label}}
+            {{rform.password1}}
+            <br>
+            {{rform.password2.label}}
+            {{rform.password2}}
+            <br><br><br>
+            
+            <button type="submit" class='btn btn-sm btn-info'>Register</button>
+            <a class='btn btn-sm btn-info' href="{% url 'home' %}">Back</a>
+        </form>
+        
+        <script src=""async defer></script>
+
+        {{rform.errors}}
+
+        </div>
+    </div>        
+</div>
+{% endblock "content" %}
+</body>
+  

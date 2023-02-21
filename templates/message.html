@@ -1,0 +1,26 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Check Your Email
+{% endblock "title" %}
+
+{% block "content" %}
+
+<body class="cover">
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-6 offset-3"> 
+            <div class="alert alert-info" role="info">                            
+                <h1> <p>Please check your email to complete the registration ! Thank You ! <br>
+                    If haven't arrived in a few minutes, you can check your spam mail.
+                </p> </h1> 
+                <hr>                           
+                <form method="POST">
+                    {% csrf_token %}
+                    <a class='btn btn-sm btn-info' href="{% url 'home' %}">Back</a>                               
+                </form>
+            </div>      
+        </div> 
+    </div>
+</div>
+{% endblock "content" %}
+</body>

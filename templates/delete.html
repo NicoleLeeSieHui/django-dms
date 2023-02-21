@@ -1,0 +1,45 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Delete Page
+{% endblock "title" %}
+
+{% block "content" %}
+<body class="cover">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10">
+            <h1 > Document Management System</h1> 
+        </div>
+        <div class="col-lg-2">
+            <h5> Welcome, {{user.username}}. | <a href="/signout">Logout</a></h5>
+        </div>
+    </div>
+</div>          
+    
+<nav class="navbar navbar-expand-sm bg-dark">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:25px;" href="/homepage">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:22px;" href="/UploadFile">Upload</a>
+    </ul>
+</nav>    
+
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-6 offset-3"> 
+            <div class="alert alert-danger" role="alert">                            
+                <h1> <p>Confirm Delete " {{dfile.title}} " ?</p> </h1> 
+                <hr>                           
+                <form method="POST">
+                    {% csrf_token %}
+                    <a class='btn btn-sm btn-info' href="{% url 'homepage' %}">Cancel</a>
+                    <input class="btn btn-sm btn-danger"  type="submit" value="Delete">                                
+                </form>
+            </div>
+        </div> 
+    </div>
+</div>
+{% endblock "content" %}
+</body>

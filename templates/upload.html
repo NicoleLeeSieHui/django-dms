@@ -1,0 +1,53 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Upload Page
+{% endblock "title" %}
+
+{% block "content" %}
+
+<body class="cover">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10">
+            <h1 > Document Management System</h1> 
+        </div>
+        <div class="col-lg-2">
+            <h5> Welcome, {{user.username}}. | <a href="/signout">Logout</a></h5>
+        </div>
+    </div>
+</div>   
+
+<nav class="navbar navbar-expand-sm bg-dark">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" style="font-size:25px;" href="/homepage">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" style="font-size:22px;" href="/UploadFile">Upload</a>
+        </li>
+    </ul>
+</nav>
+
+<br><br>
+<div class="container"> 
+    <h3>Upload Here</h3>
+    <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    {{form.title.label}}
+    {{form.title}}
+
+    <br><br>
+    {{form.uploader.label}}
+    {{form.uploader}}
+
+    <br><br>
+    {{form.file}}
+
+    <button type="submit">Upload file</button>
+    </form>
+
+    <script src=""async defer></script>
+</div>
+{% endblock "content" %}
+</body>
