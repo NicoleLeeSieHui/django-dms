@@ -34,7 +34,7 @@
         <br>
         <div style="float:right">
             <form class="form-inline">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                <input class="form-control mr-sm-2" name="s" type="search" placeholder="Search">
                 <button class="btn btn-info" type="submit">Search</button>
             </form>
         </div>
@@ -44,8 +44,9 @@
             <tr>
                 <th>File Title</th>
                 <th>Uploader</th>
-                <th>File Link</th>
+                <!-- <th>File Link</th> -->
                 <th>Time Uploaded</th>
+                <th>View
                 <th>Edit</th>
                 <th>Update</th>
                 <th>Delete</th>
@@ -56,8 +57,15 @@
             <tr>
                 <td>{{result.title}}</td>
                 <td>{{result.uploader}}</td>
-                <td><a href= "http://127.0.0.1:8000/media/{{result.file.name}}">{{result.file.name}}</a></td>
                 <td>{{result.time}}</td>
+
+                <td><form action="/history" method="POST"> 
+                {% csrf_token %}
+                    <input type="hidden" name="action" value="{{result.title}}">
+                <a class="btn btn-sm btn-info" href= "/media/{{result.file.name}}">View</a>
+                </form></td>
+
+
     
                 {% if result.uploader == user.username %}
                 <td><a class="btn btn-sm btn-secondary" href="{% url 'editfile' result.title %}" >Edit</a></td>
@@ -83,7 +91,7 @@
     
                 {% endif %}
 
-                <td><a class="btn btn-sm btn-secondary" href="http://127.0.0.1:8000/media/{{result.file.name}}" download>Download</a></td>
+                <td><a class="btn btn-sm btn-secondary" href="/media/{{result.file.name}}" download>Download</a></td>
             </tr>
     
             {% endfor %}
@@ -92,7 +100,8 @@
     </div>
     <div class="col-lg-2">
         <div class="container p-3 my-3 border border-dark">
-            <h5>Recently Viewed</h5>
+            <a href="/history">Recently Viewed</a>
+            
         </div>
     </div>
 

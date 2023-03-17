@@ -12,6 +12,7 @@ urlpatterns = [
     path('homepage/', views.homepage, name="homepage"),
     path('staffhomepage/', views.staffhomepage, name="staffhomepage"),
     path('UploadFile/', UploadFile.as_view(), name='upload'),
+    path('history/', views.history, name="history"),
     path('updatefile/<str:title>', views.updatefile, name="updatefile"),
     path('editfile/<str:title>', views.editfile, name="editfile"),
     path('deletefile/<str:title>', views.deletefile, name="deletefile"),

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login, get_user_model
 from django.contrib.sites.shortcuts import get_current_site  
@@ -15,7 +15,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 from dms import settings
 from .forms import UploadFile, RegistrationForm
-from . models import File_upload
+from . models import File_upload, History
 from .token import account_activation_token  
 
 #main page
@@ -25,9 +25,15 @@ def home(request):
 @login_required(login_url='signin')
 #user homepage
 def homepage(request):
-    
-    #to get all the uploaded files 
-    file = File_upload.objects.all()
+
+    if 's' in request.GET:
+        s = request.GET['s']
+        file = File_upload.objects.filter(title__icontains=s)
+
+    else: 
+        #to get all the uploaded files 
+        file = File_upload.objects.all()
+        
     return render(request, "homepage.html",{'file':file})
 
 #admin homepage
@@ -126,6 +132,18 @@ class UploadFile(FormView):
         super().form_valid(form)
         
         return redirect('homepage')
+    
+def history(request):
+    if request.method == "POST":
+        user = request.user
+        action = request.POST['action']
+        history = History(user=user, action=action)
+        history.save()
+
+        return redirect(f"/media/{action}")
+    
+    return render(request, "history.html")
+
 
 def updatefile(request,title):
 

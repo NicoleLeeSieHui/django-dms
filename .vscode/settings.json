@@ -1,0 +1,6 @@
+{
+    "appService.showBuildDuringDeployPrompt": false,
+    "appService.deploySubpath": ".",
+    "python.pythonPath": ".venv/bin/python",
+    "appService.defaultWebAppToDeploy": "/subscriptions/dceb1b46-7f71-4cb1-9538-9d4b26429329/resourceGroups/appsvc_linux_centralus_basic/providers/Microsoft.Web/sites/dms-django"
+}
