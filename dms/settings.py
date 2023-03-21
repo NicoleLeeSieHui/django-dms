@@ -36,6 +36,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['dms-django.azurewebsites.net', '*']
 
+CSRF_TRUSTED_ORIGINS = ['https://dms-django.azurewebsites.net']
+
 
 # Application definition
 
