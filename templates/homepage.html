@@ -22,7 +22,7 @@
         <a class="nav-link" style="font-size:25px;" href="/homepage">Home</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" style="font-size:22px;" href="/UploadFile">Upload</a>
+        <a class="nav-link" style="font-size:22px;" href="/uploadfile">Upload</a>
     </ul>
 </nav>
 
@@ -47,25 +47,30 @@
                 <!-- <th>File Link</th> -->
                 <th>Time Uploaded</th>
                 <th>View
-                <th>Edit</th>
-                <th>Update</th>
+                <th>Edit Title</th>
+                <th>Update File</th>
                 <th>Delete</th>
                 <th>Download</th>
             </tr>
     
-            {% for result in file %}
+            {% for result in file reversed %}
             <tr>
                 <td>{{result.title}}</td>
                 <td>{{result.uploader}}</td>
                 <td>{{result.time}}</td>
 
-                <td><form action="/history" method="POST"> 
+                <!-- <td>
+                    <form action="/history" method="POST"> 
                 {% csrf_token %}
-                    <input type="hidden" name="action" value="{{result.title}}">
-                <a class="btn btn-sm btn-info" href= "/media/{{result.file.name}}">View</a>
-                </form></td>
+                    <input type="hidden" name="t_id" value="{{result.title_id}}">
+                    <a class="btn btn-sm btn-info" href= "/media/{{result.file.name}}">View</a>
+                </form></td> -->
 
+                <!-- <button type="submit" class='btn btn-sm btn-info' href= "/media/{{result.file.name}}">View</button> -->
 
+                <!-- <td><a class="btn btn-sm btn-info" href= "/media/{{result.file.name}}">View</a></td> -->
+
+                <td><a class="btn btn-sm btn-info" href="{% url 'viewfile' result.title %}" >View</a></td>
     
                 {% if result.uploader == user.username %}
                 <td><a class="btn btn-sm btn-secondary" href="{% url 'editfile' result.title %}" >Edit</a></td>
@@ -100,7 +105,9 @@
     </div>
     <div class="col-lg-2">
         <div class="container p-3 my-3 border border-dark">
-            <a href="/history">Recently Viewed</a>
+            <a href="{% url 'viewhistory' user.username %}">Recently Viewed</a>
+            <br>
+            <a href="{% url 'loghistory' %}">History</a>
             
         </div>
     </div>

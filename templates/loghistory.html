@@ -1,0 +1,64 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Log History Page
+{% endblock "title" %}
+
+{% block "content" %}
+
+<body class="cover">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10">
+            <h1 > Document Management System</h1> 
+        </div>
+        <div class="col-lg-2">
+            <h5> Welcome, {{user.username}}. | <a href="/signout">Logout</a></h5>
+        </div> 
+    </div>
+</div>       
+    
+<nav class="navbar navbar-expand-sm bg-dark">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:25px;" href="/homepage">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:22px;" href="/uploadfile">Upload</a>
+    </ul>
+</nav>   
+
+<div class="container">
+    
+    {% for loghistory_obj in history_list reversed %}
+        
+        <br>
+
+        {% if loghistory_obj.action == "edited" %}
+        <h5>---- {{loghistory_obj.updated_by}} {{loghistory_obj.action}} title <i>{{loghistory_obj.file_name}}</i> <a href="{% url 'viewfile' loghistory_obj.file_name %}" >({{loghistory_obj.file_path}})</a>, {{loghistory_obj.action}} at {{loghistory_obj.updated_at}}. </h5>
+
+        {% elif loghistory_obj.action == "uploaded" %}
+        <h5>---- {{loghistory_obj.updated_by}} {{loghistory_obj.action}} file <i>{{loghistory_obj.file_name}}</i> <a href="{% url 'viewfile' loghistory_obj.file_name %}" >({{loghistory_obj.file_path}})</a>, {{loghistory_obj.action}} at {{loghistory_obj.updated_at}}. </h5>
+
+        {% elif loghistory_obj.action == "updated" %}
+        <h5>---- {{loghistory_obj.updated_by}} {{loghistory_obj.action}} file <i>{{loghistory_obj.file_name}}</i> <a href="{% url 'viewfile' loghistory_obj.file_name %}" >({{loghistory_obj.file_path}})</a>, {{loghistory_obj.action}} at {{loghistory_obj.updated_at}}. </h5>
+
+        {% else %}
+        <h5>---- {{loghistory_obj.updated_by}} {{loghistory_obj.action}} file <i>{{loghistory_obj.file_name}}</i>, {{loghistory_obj.action}} at {{loghistory_obj.updated_at}}. </h5>
+
+        {% endif %}  
+
+
+        {% empty %}
+        <br>
+        <h5>No History Found</h5>
+
+    {% endfor %}
+
+    <br>
+    <a class='btn btn-sm btn-info' href="{% url 'homepage' %}">Back</a>
+        
+   
+</div>
+{% endblock "content" %}
+</body>
+   

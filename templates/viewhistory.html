@@ -1,0 +1,79 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    History Page
+{% endblock "title" %}
+{% block "content" %}
+
+<body class="cover">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10">
+            <h1> Document Management System</h1>
+        </div>
+        <div class="col-lg-2">
+            <h5> Welcome, {{user.username}}. | <a href="/signout">Logout</a></h5>
+        </div>
+    </div>
+</div>       
+
+<nav class="navbar navbar-expand-sm bg-dark">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:25px;" href="/homepage">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:22px;" href="/uploadfile">Upload</a>
+    </ul>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10">
+        {% if user.is_authenticated %}
+
+        <br>
+        <div style="float:right">
+            <form class="form-inline">
+                <input class="form-control mr-sm-2" name="s" type="search" placeholder="Search">
+                <button class="btn btn-info" type="submit">Search</button>
+            </form>
+        </div>
+        
+        <br><br><br>
+        <h2>{{ user.username }}'s History</h2>
+
+        
+        <br>
+        <table class="table table-dark table-striped">
+            <tr>
+                <th>File Title</th>
+                <th>File Link</th>
+                <th>Viewed Time</th>
+            </tr>
+
+            {% for history_obj in history_list reversed %}
+
+            <tr>
+                <td>{{history_obj.file_name}}</td>
+                <td><a href="/media/{{history_obj.file_path}}">{{history_obj.file_path}}</a></td>
+                <td>{{history_obj.viewed_at}}</td>
+            </tr>
+        
+
+            {% empty %}
+            
+        
+                <tr>
+                    <td>-- No History Items Found --</td> 
+                </tr>
+
+            
+
+            {% endfor %}
+        </table>
+
+        {% endif %}
+</div>
+</div>
+{% endblock "content" %}
+</body>

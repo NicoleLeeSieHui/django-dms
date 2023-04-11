@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login, get_user_model
 from django.contrib.sites.shortcuts import get_current_site  
@@ -14,8 +14,9 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  
 
 from dms import settings
-from .forms import UploadFile, RegistrationForm
-from . models import File_upload, History
+from .forms import RegistrationForm
+from . models import File_upload, FileHistory, LogHistory
+from django.contrib.auth.models import User
 from .token import account_activation_token  
 
 #main page
@@ -120,29 +121,99 @@ def signin(request):
     return render(request, "signin.html", context)
     
 
-class UploadFile(FormView):
-    template_name = 'upload.html'
-    form_class = UploadFile
-    success_url = '/'
+# class UploadFile(FormView):
+#     template_name = 'upload.html'
+#     form_class = UploadFile
+#     success_url = '/'
 
-    #save the detail of uploaded file
-    def form_valid(self,form):
-        form.save()
-        print(form.cleaned_data)
-        super().form_valid(form)
+#     #save the detail of uploaded file
+#     def form_valid(self,form):
+#         form.save()
+#         print(form.cleaned_data)
+#         super().form_valid(form)
+        
+#         return redirect('homepage')
+
+def uploadfile(request):
+    if request.method == "POST":
+        title = request.POST['title']
+        uploader = request.POST.get('uploader')
+        file = request.FILES['file']
+        File_upload.objects.create(title=title,uploader=uploader,file=file)
+
+        file_obj = File_upload.objects.get(title=title)
+
+        loghistory_obj = LogHistory(
+            updated_by=request.user,
+            file_name=file_obj.title,
+            file_path=file_obj.file,
+            action="uploaded"
+            )
+        loghistory_obj.save()
         
         return redirect('homepage')
-    
-def history(request):
-    if request.method == "POST":
-        user = request.user
-        action = request.POST['action']
-        history = History(user=user, action=action)
-        history.save()
 
-        return redirect(f"/media/{action}")
+    return render(request, "upload.html")
     
-    return render(request, "history.html")
+# def history(request,title_id):
+
+#     if request.method == "POST":
+#         history, created = History.objects.get_or_create(user=request.user)
+#         title = get_object_or_404(File_upload, id=title_id)
+#         history.file.add(title)
+#         return redirect('homepage')
+
+#     return render(request, "homepage.html")
+
+# def loghistory(request,title):
+
+#     file_obj = File_upload.objects.get(title=title)
+
+#     loghistory_obj = LogHistory(
+#         file_name=file_obj.title,
+#         file_path=file_obj.file,
+#         updated_by=request.user
+#     )
+#     loghistory_obj.save()
+
+#     return render(request, 'loghistory.html')
+
+
+def viewfile(request,title):
+    # Get the file object using the file_id
+    file_obj = File_upload.objects.get(title=title)
+
+    # Create a new FileHistory object
+    history_obj = FileHistory(
+        file_name=file_obj.title,
+        file_path=file_obj.file,
+        user=request.user
+    )
+    history_obj.save()
+
+    # Render the file view template
+    return render(request, 'view.html', {'file': file_obj})
+
+def loghistory(request):
+
+    history_list = LogHistory.objects.all()
+    
+    return render(request, 'loghistory.html', {'history_list': history_list})
+
+
+def viewhistory(request, username):
+
+    user = get_object_or_404(User, username=username)
+
+    if 's' in request.GET:
+        s = request.GET['s']
+        history_list = FileHistory.objects.filter(file_name__icontains=s)
+
+    else:
+        
+        history_list = user.filehistory_set.all()
+    
+    return render(request, 'viewhistory.html', {'user': user, 'history_list': history_list})
 
 
 def updatefile(request,title):
@@ -153,6 +224,17 @@ def updatefile(request,title):
         upfile = fs.save(file.name, file)
 
         File_upload.objects.filter(title=title).update(file=file)
+
+        file = File_upload.objects.get(title=title)
+
+        loghistory_obj = LogHistory(
+            updated_by=request.user,
+            file_name=file.title,
+            file_path=file.file,
+            action="updated"
+            )
+        loghistory_obj.save()
+
         return redirect('homepage')
 
     return render(request, "update.html")
@@ -161,8 +243,18 @@ def editfile(request,title):
     file = File_upload.objects.get(title=title)
 
     if request.method == "POST":
+
         file.title = request.POST['title']
         file.save()
+
+        loghistory_obj = LogHistory(
+            updated_by=request.user,
+            file_name=file.title,
+            file_path=file.file,
+            action="edited"
+            )
+        loghistory_obj.save()
+
         return redirect('homepage')
         
     context = {'efile':file}
@@ -171,10 +263,26 @@ def editfile(request,title):
 
 def deletefile(request,title):
     file = File_upload.objects.get(title=title)
-
+    
     if request.method == "POST":
-        file.delete()
-        return redirect('homepage')
+
+        loghistory_obj = LogHistory(
+            updated_by=request.user,
+            file_name=file.title,
+            file_path=file.file,
+            action="deleted"
+            )
+        loghistory_obj.save()
+
+        if FileHistory.objects.filter(file_name=file.title) is not None:
+            file.delete()
+            FileHistory.objects.filter(file_name=file.title).delete()
+
+            return redirect('homepage')
+
+        else:
+            file.delete()
+            return redirect('homepage')
 
     context = {'dfile':file}
     return render(request, "delete.html", context)
