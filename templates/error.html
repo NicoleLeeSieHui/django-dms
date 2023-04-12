@@ -14,7 +14,13 @@
                 <hr>                           
                 <form method="POST">
                     {% csrf_token %}
-                    <a class='btn btn-sm btn-info' href="{% url 'homepage' %}">Back</a>                               
+                    {% if user.is_staff == True %}
+                    <a class='btn btn-sm btn-info' href="{% url 'staffhomepage' %}">Back</a>
+
+                    {% else %}
+                    <a class='btn btn-sm btn-info' href="{% url 'homepage' %}">Back</a>
+
+                    {% endif %}                              
                 </form>
             </div>  
         </div> 

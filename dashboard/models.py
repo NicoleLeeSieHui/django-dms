@@ -35,6 +35,17 @@ class LogHistory(models.Model):
     def __str__(self):
         return f"{self.updated_by}'s log"
     
+
+class LogUser(models.Model):
+    log_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now_add=True)
+    action = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.log_user} {self.action}"
+
+
+    
 # class History(models.Model):
 #     hist_id = models.BigAutoField(primary_key=True, default=1)
 #     user = models.ForeignKey(User, on_delete=models.CASCADE)

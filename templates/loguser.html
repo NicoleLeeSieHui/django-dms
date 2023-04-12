@@ -1,0 +1,62 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Log History Page
+{% endblock "title" %}
+
+{% block "content" %}
+
+<body class="cover">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10">
+                <h1> Document Management System</h1>
+            </div>
+            <div class="col-lg-2">
+                <h5> Welcome, {{user.username}}. | <a href="/signout">Logout</a></h5>
+            </div>
+        </div>
+    </div>       
+    
+    <nav class="navbar navbar-expand-sm bg-dark">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" style="font-size:25px;" href="/staffhomepage">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" style="font-size:22px;" href="/uploadfile">Upload</a>
+        </ul>
+    </nav>
+    
+
+<div class="container">
+        
+    <br>
+
+    {% for loguser_obj in loguser_list reversed %}
+        
+        <br>
+
+        {% if loguser_obj.action == "logged in" %}
+        <h5>---- {{loguser_obj.log_user}} <i>{{loguser_obj.action}}</i> at {{loguser_obj.time}}. </h5>
+
+        {% else %}
+        <h5>---- {{loguser_obj.log_user}} <i>{{loguser_obj.action}}</i> at {{loguser_obj.time}}. </h5>
+
+        {% endif %}
+
+
+        {% empty %}
+        <br>
+        <h5>No User Log Found</h5>
+
+    {% endfor %}
+
+    <br>
+    <br>
+    <a class='btn btn-sm btn-info' href="{% url 'staffhomepage' %}">Back</a>
+        
+   
+</div>
+{% endblock "content" %}
+</body>
+   

@@ -1,20 +1,20 @@
 {% extends 'other/base.html' %}
 {% block "title" %}
-    Home Page
+    Admin Home Page
 {% endblock "title" %}
 {% block "content" %}
 
 <body class="cover">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-10">
-                <h1 > Document Management System</h1> 
-            </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10">
+            <h1> Document Management System</h1>
+        </div>
         <div class="col-lg-2">
             <h5> Welcome, {{user.username}}. | <a href="/signout">Logout</a></h5>
-        </div>  
+        </div>
     </div>
-</div>         
+</div>       
 
 <nav class="navbar navbar-expand-sm bg-dark">
     <ul class="navbar-nav">
@@ -34,7 +34,7 @@
         <br>
         <div style="float:right">
             <form class="form-inline">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                <input class="form-control mr-sm-2" name="s" type="search" placeholder="Search">
                 <button class="btn btn-info" type="submit">Search</button>
             </form>
         </div>
@@ -44,19 +44,33 @@
             <tr>
                 <th>File Title</th>
                 <th>Uploader</th>
-                <th>File Link</th>
+                <!-- <th>File Link</th> -->
                 <th>Time Uploaded</th>
-                <th>Edit</th>
-                <th>Update</th>
+                <th>View
+                <th>Edit Title</th>
+                <th>Update File</th>
                 <th>Delete</th>
+                <th>Download</th>
             </tr>
     
-            {% for result in file %}
+            {% for result in file reversed %}
             <tr>
                 <td>{{result.title}}</td>
                 <td>{{result.uploader}}</td>
-                <td><a href= "{{result.file.name}}">{{result.file.name}}</a></td>
                 <td>{{result.time}}</td>
+
+                <!-- <td>
+                    <form action="/history" method="POST"> 
+                {% csrf_token %}
+                    <input type="hidden" name="t_id" value="{{result.title_id}}">
+                    <a class="btn btn-sm btn-info" href= "/media/{{result.file.name}}">View</a>
+                </form></td> -->
+
+                <!-- <button type="submit" class='btn btn-sm btn-info' href= "/media/{{result.file.name}}">View</button> -->
+
+                <!-- <td><a class="btn btn-sm btn-info" href= "/media/{{result.file.name}}">View</a></td> -->
+
+                <td><a class="btn btn-sm btn-info" href="{% url 'viewfile' result.title %}" >View</a></td>
     
                 {% if result.uploader == user.username %}
                 <td><a class="btn btn-sm btn-secondary" href="{% url 'editfile' result.title %}" >Edit</a></td>
@@ -81,21 +95,27 @@
                 <td><a class="btn btn-sm btn-danger" href="/error">Delete</a></td>
     
                 {% endif %}
+
+                <td><a class="btn btn-sm btn-secondary" href="/media/{{result.file.name}}" download>Download</a></td>
             </tr>
+    
             {% endfor %}
         </table>
-    </div>
 
+    </div>
     <div class="col-lg-2">
         <div class="container p-3 my-3 border border-dark">
-            <h5>Recently Viewed</h5>
-        </div>
-        <div class="container p-3 my-3 border border-dark">
-            <a href="#" class="text-reset"><u>Add Permission</u></a>
+            <a href="{% url 'viewhistory' user.username %}">Recently Viewed</a>
             <br>
-            <a href="#" class="text-reset"><u>Generate Report</u></a>
+            <a href="{% url 'loghistory' %}">File History</a>
+            <br>
+            <a href="{% url 'loguser' %}">User Log</a>
+            <br>
+            <a href="{% url 'userlist' %}">User List</a>
+            
         </div>
     </div>
+
     {% endif %}
 </div>
 </div>

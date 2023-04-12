@@ -14,10 +14,12 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  
 
 from dms import settings
-from .forms import RegistrationForm
-from . models import File_upload, FileHistory, LogHistory
+from .forms import RegistrationForm, AdminRegistrationForm, CheckBoxForm, UserPasswordForm
+from . models import File_upload, FileHistory, LogHistory, LogUser
 from django.contrib.auth.models import User
 from .token import account_activation_token  
+
+from django.contrib.auth.hashers import make_password
 
 #main page
 def home(request):
@@ -40,8 +42,14 @@ def homepage(request):
 #admin homepage
 def staffhomepage(request):
 
-    #to get all the uploaded files
-    file = File_upload.objects.all()
+    if 's' in request.GET:
+        s = request.GET['s']
+        file = File_upload.objects.filter(title__icontains=s)
+
+    else: 
+        #to get all the uploaded files 
+        file = File_upload.objects.all()
+
     return render(request, "staffhomepage.html",{'file':file})
 
 #register new account
@@ -78,6 +86,40 @@ def register(request):
 
     return render(request, "register.html", context)
     
+def adminregister(request):
+    rform = AdminRegistrationForm()
+
+    #registration
+    if request.method == "POST":
+       rform = AdminRegistrationForm(request.POST)
+       if rform.is_valid():
+        user = rform.save(commit = False)
+        user.is_staff = True
+        user.is_superuser = True
+        user.is_active = False
+        user.save()
+
+        # Email send to user for verification 
+        current_site = get_current_site(request)
+        from_mail = settings.EMAIL_HOST_USER
+        to_mail = [user.email]
+        mail_subject = "Email Confirmation - DMS Page"
+        message = render_to_string('verification.html', {  
+            'user': user,  
+            'domain': current_site.domain,  
+            'uid':urlsafe_base64_encode(force_bytes(user.pk)),  
+            'token':account_activation_token.make_token(user)  
+        })
+        email = EmailMessage(  
+                    mail_subject, message, from_mail, to_mail,
+        )  
+        email.send()  
+        return redirect('message')
+
+
+    context = {'rform':rform}
+
+    return render(request, "adminregister.html", context)
 
 def activate(request, uidb64, token): 
 
@@ -90,13 +132,18 @@ def activate(request, uidb64, token):
         user = None  
     if user is not None and account_activation_token.check_token(user, token):  
         user.is_active = True  
-        user.save()  
-        login(request, user)
-        return redirect('homepage')
-
+        user.save()
+        if user.is_staff == True:
+                login(request, user)
+                return redirect('staffhomepage')
+            
+        else: 
+            login(request, user)
+            return redirect('homepage')  
+        
     else:
         return render(request, 'failed.html')
-        
+     
 
 def signin(request):
     #login
@@ -109,8 +156,23 @@ def signin(request):
 
         #User exists
         if user is not None:
-            login(request, user)
-            return redirect('homepage')
+            if user.is_staff == True:
+                login(request, user)
+                loguser_obj = LogUser(
+                    log_user=request.user,
+                    action="logged in"
+                    )
+                loguser_obj.save()
+                return redirect('staffhomepage')
+            
+            else: 
+                login(request, user)
+                loguser_obj = LogUser(
+                    log_user=request.user,
+                    action="logged in"
+                    )
+                loguser_obj.save()
+                return redirect('homepage')
 
         else:
             #User not exist
@@ -134,6 +196,85 @@ def signin(request):
         
 #         return redirect('homepage')
 
+def userlist(request):
+
+    if 's' in request.GET:
+        s = request.GET['s']
+        users = User.objects.filter(username__icontains=s)
+
+    else: 
+        #to get all the uploaded files 
+        users = User.objects.all()
+
+    return render(request, 'userlist.html', {'users': users})
+
+def adduser(request):
+    form1 = RegistrationForm()
+    form2 = CheckBoxForm()
+
+    if request.method == "POST":
+       form1 = RegistrationForm(request.POST)
+       form2 = CheckBoxForm(request.POST)
+       if form1.is_valid():
+        if form2.is_valid():
+            if request.POST.get('my_checkbox'):
+                users = form1.save(commit = False)
+                users.is_active = True
+                users.is_staff = True
+                users.is_superuser = True
+                users.save()
+
+            else:
+                users = form1.save(commit = False)
+                users.is_active = True
+                users.is_staff = False
+                users.is_superuser = False
+                users.save()
+        
+        return redirect('userlist')
+    
+    context = {'form1':form1, 'form2': form2}
+
+    return render(request, 'adduser.html', context)
+
+def edituser(request, id):
+
+    form = CheckBoxForm()
+    users = User.objects.get(id=id)
+
+    if request.method == 'POST':
+        form = CheckBoxForm(request.POST)
+        users.username = request.POST['username']
+        users.email = request.POST['email']
+
+        if form.is_valid():
+            if request.POST.get('my_checkbox'):
+                users.is_staff = True
+                users.is_superuser = True
+                users.save()
+
+            else:
+                users.is_staff = False
+                users.is_superuser = False
+                users.save()
+
+        return redirect('userlist')          
+    
+    return render(request, 'edituser.html', {'users': users, 'form': form})
+
+def userpassword(request, id):
+   users = User.objects.get(id=id)
+
+   if request.method == 'POST':
+        new_password = request.POST['new_password1']
+        hashed_password = make_password(new_password)
+        users.password = hashed_password
+        users.save()
+
+        return redirect('userlist')
+        
+   return render(request, 'userpassword.html', {'users': users})
+
 def uploadfile(request):
     if request.method == "POST":
         title = request.POST['title']
@@ -151,7 +292,12 @@ def uploadfile(request):
             )
         loghistory_obj.save()
         
-        return redirect('homepage')
+        if request.user.is_staff == True:
+            return redirect('staffhomepage')
+            
+        else: 
+            return redirect('homepage')
+        
 
     return render(request, "upload.html")
     
@@ -200,6 +346,11 @@ def loghistory(request):
     
     return render(request, 'loghistory.html', {'history_list': history_list})
 
+def loguser(request):
+
+    loguser_list = LogUser.objects.all()
+    
+    return render(request, 'loguser.html', {'loguser_list': loguser_list})
 
 def viewhistory(request, username):
 
@@ -235,7 +386,11 @@ def updatefile(request,title):
             )
         loghistory_obj.save()
 
-        return redirect('homepage')
+        if request.user.is_staff == True:
+            return redirect('staffhomepage')
+            
+        else: 
+            return redirect('homepage')
 
     return render(request, "update.html")
 
@@ -255,7 +410,11 @@ def editfile(request,title):
             )
         loghistory_obj.save()
 
-        return redirect('homepage')
+        if request.user.is_staff == True:
+            return redirect('staffhomepage')
+            
+        else: 
+            return redirect('homepage')
         
     context = {'efile':file}
 
@@ -278,11 +437,18 @@ def deletefile(request,title):
             file.delete()
             FileHistory.objects.filter(file_name=file.title).delete()
 
-            return redirect('homepage')
+            if request.user.is_staff == True:
+                return redirect('staffhomepage')
+            else: 
+                return redirect('homepage')
 
         else:
             file.delete()
-            return redirect('homepage')
+            
+            if request.user.is_staff == True:
+                return redirect('staffhomepage')
+            else: 
+                return redirect('homepage')
 
     context = {'dfile':file}
     return render(request, "delete.html", context)
@@ -295,6 +461,11 @@ def error(request):
 
 def signout(request):
     #logout
+    loguser_obj = LogUser(
+        log_user=request.user,
+        action="logged out"
+        )
+    loguser_obj.save()
     logout(request)
 
     return redirect('home')
