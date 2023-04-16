@@ -14,12 +14,124 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode  
 
 from dms import settings
-from .forms import RegistrationForm, AdminRegistrationForm, CheckBoxForm, UserPasswordForm
-from . models import File_upload, FileHistory, LogHistory, LogUser
+from .forms import RegistrationForm, AdminRegistrationForm, CheckBoxForm, UserPasswordForm, OwnPasswordForm
+from .models import File_upload, FileHistory, LogHistory, LogUser
 from django.contrib.auth.models import User
 from .token import account_activation_token  
 
 from django.contrib.auth.hashers import make_password
+
+from django.http import HttpResponse
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
+
+
+def trackuser(request,username):
+    # retrieve the current user's uploaded files and count them
+    upload_files = File_upload.objects.filter(uploader=username)
+    upload_count = upload_files.count()
+
+    delete_files = LogHistory.objects.filter(updated_by__username=username, action="deleted")
+    delete_count = delete_files.count()
+
+    edit_files = LogHistory.objects.filter(updated_by__username=username, action="edited")
+    edit_count = edit_files.count()
+
+    update_files = LogHistory.objects.filter(updated_by__username=username, action="updated")
+    update_count = update_files.count()
+
+    view_files = FileHistory.objects.filter(user__username=username)
+    view_count = view_files.count()
+
+    context = {'upload_count': upload_count,'delete_count': delete_count, 
+               'edit_count':edit_count, 'update_count':update_count, 'view_count': view_count}
+
+    return render(request, 'trackuser.html', context)
+
+
+def loghistory_pdf(request):
+    # Create Bytestream buffer
+    buf = io.BytesIO()
+    # Create a canvas
+    c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+    # Create a text object
+    textob = c.beginText()
+    textob.setTextOrigin(inch, inch)
+    textob.setFont("Helvetica", 14)
+
+    # Designate The Model
+    loghistorys = LogHistory.objects.all()
+
+    # Create blank list
+    lines = []
+
+    for loghistory in loghistorys:
+        lines.append(str(loghistory.updated_at))
+        lines.append(str(loghistory.updated_by)+ " " + loghistory.action + " file " + loghistory.file_name)
+        lines.append("(" + loghistory.file_path + ")")
+        lines.append("===================")
+        lines.append("")
+        
+    #Loop
+    for line in lines:
+        textob.textLine(line)
+            
+    #Finish up
+    c.drawText(textob)
+    c.showPage()
+    c.save()
+    buf.seek(0)
+        
+    # Create a new HttpResponse object with the PDF data
+    response = HttpResponse(buf, content_type='application/pdf')
+
+    # Set the Content-Disposition header to inline to display the PDF in the browser
+    response['Content-Disposition'] = 'inline; filename="loghistory.pdf"'
+
+    # Return the HttpResponse object
+    return response
+
+def loguser_pdf(request):
+    # Create Bytestream buffer
+    buf = io.BytesIO()
+    # Create a canvas
+    c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+    # Create a text object
+    textob = c.beginText()
+    textob.setTextOrigin(inch, inch)
+    textob.setFont("Helvetica", 14)
+
+    # Designate The Model
+    logusers = LogUser.objects.all()
+
+    # Create blank list
+    lines = []
+
+    for loguser in logusers:
+        lines.append(str(loguser.time)+ "  " + str(loguser.log_user) + " " + loguser.action)
+        lines.append("")
+        
+    #Loop
+    for line in lines:
+        textob.textLine(line)
+            
+    #Finish up
+    c.drawText(textob)
+    c.showPage()
+    c.save()
+    buf.seek(0)
+        
+    # Create a new HttpResponse object with the PDF data
+    response = HttpResponse(buf, content_type='application/pdf')
+
+    # Set the Content-Disposition header to inline to display the PDF in the browser
+    response['Content-Disposition'] = 'inline; filename="loguser.pdf"'
+
+    # Return the HttpResponse object
+    return response
+
 
 #main page
 def home(request):
@@ -144,7 +256,6 @@ def activate(request, uidb64, token):
     else:
         return render(request, 'failed.html')
      
-
 def signin(request):
     #login
     if request.method == "POST":
@@ -182,19 +293,6 @@ def signin(request):
 
     return render(request, "signin.html", context)
     
-
-# class UploadFile(FormView):
-#     template_name = 'upload.html'
-#     form_class = UploadFile
-#     success_url = '/'
-
-#     #save the detail of uploaded file
-#     def form_valid(self,form):
-#         form.save()
-#         print(form.cleaned_data)
-#         super().form_valid(form)
-        
-#         return redirect('homepage')
 
 def userlist(request):
 
@@ -262,6 +360,30 @@ def edituser(request, id):
     
     return render(request, 'edituser.html', {'users': users, 'form': form})
 
+def editown(request, id):
+    
+    users = User.objects.get(id=id)
+    form = OwnPasswordForm(users)
+
+    if request.method == 'POST':
+        users.username = request.POST['username']
+        users.email = request.POST['email']
+        form = OwnPasswordForm(users, request.POST)
+
+        if form.is_valid():
+            form.save()
+            users.save()
+            if request.user.is_staff == True:
+                return redirect('staffhomepage')
+            
+            else: 
+                return redirect('homepage')
+        
+        else:
+            form = UserPasswordForm(users)        
+    
+    return render(request, 'editown.html', {'users': users, 'form': form})
+
 def userpassword(request, id):
    users = User.objects.get(id=id)
 
@@ -301,29 +423,6 @@ def uploadfile(request):
 
     return render(request, "upload.html")
     
-# def history(request,title_id):
-
-#     if request.method == "POST":
-#         history, created = History.objects.get_or_create(user=request.user)
-#         title = get_object_or_404(File_upload, id=title_id)
-#         history.file.add(title)
-#         return redirect('homepage')
-
-#     return render(request, "homepage.html")
-
-# def loghistory(request,title):
-
-#     file_obj = File_upload.objects.get(title=title)
-
-#     loghistory_obj = LogHistory(
-#         file_name=file_obj.title,
-#         file_path=file_obj.file,
-#         updated_by=request.user
-#     )
-#     loghistory_obj.save()
-
-#     return render(request, 'loghistory.html')
-
 
 def viewfile(request,title):
     # Get the file object using the file_id
@@ -351,6 +450,12 @@ def loguser(request):
     loguser_list = LogUser.objects.all()
     
     return render(request, 'loguser.html', {'loguser_list': loguser_list})
+
+def viewprofile(request,id):
+
+    user = User.objects.get(id=id)
+    
+    return render(request, 'viewprofile.html', {'user':user})
 
 def viewhistory(request, username):
 

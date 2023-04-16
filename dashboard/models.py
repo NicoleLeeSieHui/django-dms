@@ -14,7 +14,7 @@ class File_upload(models.Model):
     def __str__(self):
         return str(self.title_id)
 
-
+#Recently Viewed
 class FileHistory(models.Model):
     file_name = models.CharField(max_length=100)
     file_path = models.CharField(max_length=255)
@@ -24,7 +24,7 @@ class FileHistory(models.Model):
     def __str__(self):
         return f"{self.user}'s history"
 
-
+#File History
 class LogHistory(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now_add=True)
@@ -35,7 +35,7 @@ class LogHistory(models.Model):
     def __str__(self):
         return f"{self.updated_by}'s log"
     
-
+#User Log
 class LogUser(models.Model):
     log_user = models.ForeignKey(User, on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)

@@ -49,6 +49,7 @@
                 <th>Is Staff?</th>
                 <th>Edit User</th>
                 <th>Change Password</th>
+                <th>Track</th>
             </tr>
 
         
@@ -60,6 +61,7 @@
                 <td>{{ user.is_staff }}</td>
                 <td><a class='btn btn-sm btn-info' href="{% url 'edituser' user.id %}">Edit User</a></td>
                 <td><a class='btn btn-sm btn-info' href="{% url 'userpassword' user.id %}">Change Password</a></td>
+                <td><a class='btn btn-sm btn-info' href="{% url 'trackuser' user.username %}">Track</a></td>
             </tr>
 
             {% empty %}

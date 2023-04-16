@@ -1,0 +1,49 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Track User Page
+{% endblock "title" %}
+{% block "content" %}
+
+<body class="cover">
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10">
+            <h1> Document Management System</h1>
+        </div>
+        <div class="col-lg-2">
+            <h5> Welcome, {{user.username}}. | <a href="/signout">Logout</a></h5>
+        </div>
+    </div>
+</div>       
+
+<nav class="navbar navbar-expand-sm bg-dark">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:25px;" href="/staffhomepage">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:22px;" href="/uploadfile">Upload</a>
+    </ul>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-10">
+        {% if user.is_authenticated %}
+        
+        <br>
+        <p>Uploaded {{ upload_count }} files </p>
+        <p>Deleted {{ delete_count }} files </p>
+        <p>Edited {{ edit_count }} files </p>
+        <p>Updated {{ update_count }} files </p>
+        <p>Viewed {{ view_count }} files </p>
+        
+        <a class='btn btn-sm btn-info' href="{% url 'userlist' %}">Back</a>
+        
+    
+    {% endif %}
+
+</div>
+</div>
+{% endblock "content" %}
+</body>

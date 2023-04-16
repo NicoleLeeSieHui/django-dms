@@ -24,6 +24,10 @@ class UserPasswordForm(PasswordChangeForm):
         model = User
         fields = ['new_password1','new_password2']
 
+class OwnPasswordForm(PasswordChangeForm):
+    class Meta:
+        model = User
+
 # class UploadFile(forms.ModelForm):
 #     class Meta:
 #         model = File_upload

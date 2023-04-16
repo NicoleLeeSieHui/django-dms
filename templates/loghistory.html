@@ -34,10 +34,15 @@
 </nav>   
 
 <div class="container">
-    
+
+    <br>
+    {% if user.is_staff == True %}
+        <a class='btn btn-sm btn-info' href="{% url 'loghistory_pdf' %}">History Log Report</a>
+    {% endif %}
+
     {% for loghistory_obj in history_list reversed %}
         
-        <br>
+        <br><br>
 
         {% if loghistory_obj.action == "edited" %}
         <h5>---- {{loghistory_obj.updated_by}} {{loghistory_obj.action}} title <i>{{loghistory_obj.file_name}}</i> <a href="{% url 'viewfile' loghistory_obj.file_name %}" >({{loghistory_obj.file_path}})</a>, {{loghistory_obj.action}} at {{loghistory_obj.updated_at}}. </h5>

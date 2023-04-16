@@ -1,0 +1,70 @@
+{% extends 'other/base.html' %}
+{% block "title" %}
+    Edit Profile Page
+{% endblock "title" %}
+
+{% block "content" %}
+
+<body class="cover">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-10">
+            <h1 > Document Management System</h1> 
+        </div>
+        <div class="col-lg-2">
+            <h5> Welcome, {{user.username}}. | <a href="/signout">Logout</a></h5>
+        </div> 
+    </div>
+</div>       
+    
+<nav class="navbar navbar-expand-sm bg-dark">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        {% if user.is_staff == True %}
+        <a class="nav-link" style="font-size:25px;" href="/staffhomepage">Home</a>
+
+        {% else %}
+        <a class="nav-link" style="font-size:25px;" href="/homepage">Home</a>
+
+        {% endif %}
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" style="font-size:22px;" href="/uploadfile">Upload</a>
+    </ul>
+</nav>   
+
+<div class="container">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div>
+            <label> Username </label>
+        <input type="text" class="form-control" name="username" value="{{users.username}}">
+        </div>
+
+        <br>
+        <div> 
+            <label> Email </label>
+        <input type="email" class="form-control" name="email" value="{{users.email}}">
+        </div>
+        <br>
+        
+        {{ form.as_p }}
+        
+        <br><br>
+        <button type="submit" class='btn btn-sm btn-info'>Save</button>
+
+        </form>
+    {% if user.is_staff == True %}
+    <a class='btn btn-sm btn-info' href="{% url 'staffhomepage' %}">Back</a>
+
+    {% else %}
+    <a class='btn btn-sm btn-info' href="{% url 'homepage' %}">Back</a>
+
+    {% endif %}   
+        
+    </form>
+</div>
+{% endblock "content" %}
+</body>
+   

@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'dashboard.apps.DashboardConfig',
     'verify_email.apps.VerifyEmailConfig',
-
+    'bootstrap4'
 ]
 
 MIDDLEWARE = [
