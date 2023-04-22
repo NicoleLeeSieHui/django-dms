@@ -133,11 +133,45 @@ def loguser_pdf(request):
     return response
 
 
+
 #main page
 def home(request):
-    return render(request, "index.html")
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
-@login_required(login_url='signin')
+        #check whether user is exist
+        user = authenticate(request, username=username, password=password)
+
+        #User exists
+        if user is not None:
+            if user.is_staff == True:
+                login(request, user)
+                loguser_obj = LogUser(
+                    log_user=request.user,
+                    action="logged in"
+                    )
+                loguser_obj.save()
+                return redirect('staffhomepage')
+            
+            else: 
+                login(request, user)
+                loguser_obj = LogUser(
+                    log_user=request.user,
+                    action="logged in"
+                    )
+                loguser_obj.save()
+                return redirect('homepage')
+
+        else:
+            #User not exist
+            messages.info(request,"Invalid Username or Password !!")
+    
+    context = {}
+
+    return render(request, "index.html", context)
+
+@login_required(login_url='')
 #user homepage
 def homepage(request):
 
@@ -256,42 +290,42 @@ def activate(request, uidb64, token):
     else:
         return render(request, 'failed.html')
      
-def signin(request):
-    #login
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+# def signin(request):
+#     #login
+#     if request.method == "POST":
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
 
-        #check whether user is exist
-        user = authenticate(request, username=username, password=password)
+#         #check whether user is exist
+#         user = authenticate(request, username=username, password=password)
 
-        #User exists
-        if user is not None:
-            if user.is_staff == True:
-                login(request, user)
-                loguser_obj = LogUser(
-                    log_user=request.user,
-                    action="logged in"
-                    )
-                loguser_obj.save()
-                return redirect('staffhomepage')
+#         #User exists
+#         if user is not None:
+#             if user.is_staff == True:
+#                 login(request, user)
+#                 loguser_obj = LogUser(
+#                     log_user=request.user,
+#                     action="logged in"
+#                     )
+#                 loguser_obj.save()
+#                 return redirect('staffhomepage')
             
-            else: 
-                login(request, user)
-                loguser_obj = LogUser(
-                    log_user=request.user,
-                    action="logged in"
-                    )
-                loguser_obj.save()
-                return redirect('homepage')
+#             else: 
+#                 login(request, user)
+#                 loguser_obj = LogUser(
+#                     log_user=request.user,
+#                     action="logged in"
+#                     )
+#                 loguser_obj.save()
+#                 return redirect('homepage')
 
-        else:
-            #User not exist
-            messages.info(request,"Invalid Username or Password !!")
+#         else:
+#             #User not exist
+#             messages.info(request,"Invalid Username or Password !!")
     
-    context = {}
+#     context = {}
 
-    return render(request, "signin.html", context)
+#     return render(request, "signin.html", context)
     
 
 def userlist(request):
