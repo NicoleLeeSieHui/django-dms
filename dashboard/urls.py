@@ -2,14 +2,13 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
-# from .views import UploadFile
+
 
 urlpatterns = [
     path('', views.home, name="home"),
     path('register/', views.register, name="register"),
     path('adminregister/', views.adminregister, name="adminregister"),
     path('activate/<uidb64>/<token>', views.activate, name='activate'),  
-    # path('signin/', views.signin, name="signin"),
     path('homepage/', views.homepage, name="homepage"),
     path('staffhomepage/', views.staffhomepage, name="staffhomepage"),
     path('userlist/', views.userlist, name='userlist'),
@@ -17,9 +16,7 @@ urlpatterns = [
     path('edituser/<int:id>', views.edituser, name='edituser'),
     path('editown/<int:id>', views.editown, name='editown'),
     path('userpassword/<int:id>', views.userpassword, name='userpassword'),
-    # path('UploadFile/', UploadFile.as_view(), name='upload'),
     path('uploadfile/', views.uploadfile, name="uploadfile"),
-    # path('history/<int:title_id>', views.history, name="history"),
     path('viewfile/<str:title>', views.viewfile, name="viewfile"),
     path('loghistory/', views.loghistory, name='loghistory'),
     path('loghistory_pdf', views.loghistory_pdf, name='loghistory_pdf'),

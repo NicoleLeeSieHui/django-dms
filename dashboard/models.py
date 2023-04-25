@@ -46,14 +46,4 @@ class LogUser(models.Model):
 
 
     
-# class History(models.Model):
-#     hist_id = models.BigAutoField(primary_key=True, default=1)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     file = models.ManyToManyField(File_upload, blank=True)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return f"{self.user}'s history"
-
-    
     

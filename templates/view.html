@@ -49,14 +49,11 @@
             <h4> Title </h4>
             {{file.title}}
         </div>
-
         <br><br>
         <div>
             <h4>Click the link below to view</h4>
             <a href= "/media/{{file.file.name}}"><u>{{file.file.name}}</u></a>
         </div>
-       
-        
         <br><br>
    
         {% if user.is_staff == True %}

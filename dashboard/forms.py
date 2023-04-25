@@ -1,5 +1,4 @@
 from django import forms
-# from .models import File_upload
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth.models import User
 
@@ -28,9 +27,5 @@ class OwnPasswordForm(PasswordChangeForm):
     class Meta:
         model = User
 
-# class UploadFile(forms.ModelForm):
-#     class Meta:
-#         model = File_upload
-#         fields = ['title','uploader','file',]
 
         

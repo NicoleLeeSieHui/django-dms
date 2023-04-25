@@ -1,6 +1,6 @@
 {% extends 'other/base.html' %}
 {% block "title" %}
-    Admin Home Page
+    Home Page
 {% endblock "title" %}
 {% block "content" %}
 
@@ -50,7 +50,6 @@
             <tr>
                 <th>File Title</th>
                 <th>Uploader</th>
-                <!-- <th>File Link</th> -->
                 <th>Time Uploaded</th>
                 <th>View
                 <th>Edit Title</th>
@@ -64,17 +63,6 @@
                 <td>{{result.title}}</td>
                 <td>{{result.uploader}}</td>
                 <td>{{result.time}}</td>
-
-                <!-- <td>
-                    <form action="/history" method="POST"> 
-                {% csrf_token %}
-                    <input type="hidden" name="t_id" value="{{result.title_id}}">
-                    <a class="btn btn-sm btn-info" href= "/media/{{result.file.name}}">View</a>
-                </form></td> -->
-
-                <!-- <button type="submit" class='btn btn-sm btn-info' href= "/media/{{result.file.name}}">View</button> -->
-
-                <!-- <td><a class="btn btn-sm btn-info" href= "/media/{{result.file.name}}">View</a></td> -->
 
                 <td><a class="btn btn-sm btn-info" href="{% url 'viewfile' result.title %}" >View</a></td>
     
