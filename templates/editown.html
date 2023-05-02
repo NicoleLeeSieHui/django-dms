@@ -64,7 +64,7 @@
         {{ form.as_p }}
         
         <br><br>
-        <button type="submit" class='btn btn-primary px-4'>Save</button>
+        <button type="submit" class='btn btn-primary px-4' href="{% url 'home' %}">Save</button>
 
         {% if user.is_staff == True %}
         <a class='btn btn-primary px-4' href="{% url 'staffhomepage' %}">Back</a>

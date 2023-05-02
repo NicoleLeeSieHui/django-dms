@@ -282,11 +282,7 @@ def editown(request, id):
         if form.is_valid():
             form.save()
             users.save()
-            if request.user.is_staff == True:
-                return redirect('staffhomepage')
-            
-            else: 
-                return redirect('homepage')
+            return redirect('home')
         
         else:
             form = UserPasswordForm(users)        
